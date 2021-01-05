@@ -1,12 +1,18 @@
 ---
 title: "Exploratory Data Analysis Assignment 2"
 author: "Myron Keith Gibert Jr"
-date: "10/15/2020"
+date: "1/4/2021"
 output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+if (!require("tidyverse")) install.packages("tidyverse")
+library("tidyverse")
+
+if (!require("ggplot2")) install.packages("ggplot2")
+library("ggplot2")
 ```
 
 ## Introduction
@@ -62,9 +68,22 @@ Have total emissions from PM2.5 decreased in the United States from 1999 to 2008
 
 ```{r figure 1}
 
+NEI_summary <- NEI %>%
+  group_by(year) %>%
+  summarise(Emissions=sum(Emissions))
 
+png(file="plot1.png")
+
+plot(NEI_summary$year,NEI_summary$Emissions, type = "l", lwd = 2, 
+     xlab = "Year", 
+     ylab = expression("Total Tons of PM"[2.5]*" Emissions"), 
+     main = expression("Total Tons of PM"[2.5]*" Emissions in the United States"))
+
+dev.off()
 
 ```
+
+Emissions have decreased in the United States from 1999 to 2008.
 
 ## Problem 2
 
@@ -73,29 +92,80 @@ Of the four types of sources indicated by the (point, nonpoint, onroad, nonroad)
 
 ```{r figure 2}
 
+NEI_baltimore <- NEI %>%
+  filter(fips == 24510) %>%
+  group_by(year) %>%
+  summarise(Emissions=sum(Emissions))
 
+png(file="plot2.png")
+
+plot(NEI_baltimore$year,NEI_baltimore$Emissions, type = "l", lwd = 2, 
+     xlab = "Year", 
+     ylab = expression("Total Tons of PM"[2.5]*" Emissions"), 
+     main = expression("Total Tons of PM"[2.5]*" Emissions in the Baltimore"))
+
+dev.off()
 
 ```
+
+Emissions have decreased in Baltimore City, Maryland from 1999 to 2008.
 
 ## Problem 3
 
-Across the United States, how have emissions from coal combustion-related sources changed from 1999–2008?
+Of the four types of sources indicated by the "type" (point, nonpoint, onroad, nonroad) variable, which of these four sources have seen decreases in emissions from 1999–2008 for Baltimore City? Which have seen increases in emissions from 1999–2008? Use the ggplot2 plotting system to make a plot answer this question.
 
 ```{r figure 3}
 
+NEI_baltimore_type <- NEI %>%
+  filter(fips == 24510) %>%
+  group_by(year,type) %>%
+  summarise(Emissions=sum(Emissions))
 
+p <- ggplot(NEI_baltimore_type, aes(x = factor(year), y = Emissions, fill = type)) + 
+  geom_bar(stat = "identity") + 
+  facet_grid(. ~ type) + 
+  xlab("Year") + 
+  ylab(expression("Total Tons of PM"[2.5]*" Emissions")) + 
+  ggtitle(expression("Total Tons of PM"[2.5]*" Emissions in Baltimore by Source Type")) +
+  theme(axis.text.x=element_text(angle = 90, vjust = 0.5, hjust = 1), plot.title = element_text(size=rel(1.5), face="bold",hjust = 0.5))
+
+ggsave(file="plot3.png",plot = print(p), width = 10, height = 5, dpi = 300)
+
+p
 
 ```
+
+On-road, Off-road, and Nonpoint emissions decreased in Baltimore City from 1999-2008.
 
 ## Problem 4
 
-How have emissions from motor vehicle sources changed from 1999–2008 in Baltimore City?
+Across the United States, how have emissions from coal combustion-related sources changed from 1999–2008?
 
 ```{r figure 4}
 
+SCC_coal <- SCC[grep("Coal",SCC$Short.Name),]
+SCC_coal_SCC <- unique(SCC_coal$SCC)
+NEI_coal <- subset(NEI,SCC %in% SCC_coal_SCC)
 
+NEI_coal_type <- NEI_coal %>%
+  group_by(year,type) %>%
+  summarise(Emissions=sum(Emissions))
+
+p <- ggplot(NEI_coal_type, aes(x = factor(year), y = Emissions, fill = type)) + 
+  geom_bar(stat = "identity") + 
+  facet_grid(. ~ type) + 
+  xlab("Year") + 
+  ylab(expression("Total Tons of PM"[2.5]*" Emissions")) + 
+  ggtitle(expression("Total Tons of PM"[2.5]*" Emissions in the United States from Coal Combustion-related Sources")) +
+  theme(axis.text.x=element_text(angle = 90, vjust = 0.5, hjust = 1), plot.title = element_text(size=rel(1.5), face="bold",hjust = 0.5))
+
+ggsave(file="plot4.png",plot = print(p), width = 10, height = 5, dpi = 300)
+
+p
 
 ```
+
+Point emissions in the United States have steadily decreased since 1999, while nonpoint emissions spiked between 1999-2005 before decreasing from 2005-2008. 
 
 ## Problem 5
 
@@ -103,6 +173,63 @@ Compare emissions from motor vehicle sources in Baltimore City with emissions fr
 
 ```{r figure 5}
 
+SCC_dmv <- SCC[grep("Vehicle",SCC$SCC.Level.Two),]
+SCC_dmv_SCC <- unique(SCC_dmv$SCC)
+NEI_dmv <- subset(NEI,SCC %in% SCC_dmv_SCC)
 
+NEI_dmv_type <- NEI_dmv %>%
+  filter(type=="ON-ROAD"|type=="NON-ROAD") %>%
+  group_by(year,type) %>%
+  summarise(Emissions=sum(Emissions))
+
+p <- ggplot(NEI_dmv_type, aes(x = factor(year), y = Emissions, fill = type)) + 
+  geom_bar(stat = "identity") + 
+  facet_grid(. ~ type) + 
+  xlab("Year") + 
+  ylab(expression("Total Tons of PM"[2.5]*" Emissions")) + 
+  ggtitle(expression("Total Tons of PM"[2.5]*" Emissions in the United States from Motor Vehicle Sources")) +
+  theme(axis.text.x=element_text(angle = 90, vjust = 0.5, hjust = 1), plot.title = element_text(size=rel(1.5), face="bold",hjust = 0.5))
+
+ggsave(file="plot5.png",plot = print(p), width = 10, height = 5, dpi = 300)
+
+p
 
 ```
+
+Both non-road and on-road motor vehicle emissions have decreased in the United States from 1999-2008.
+
+## Problem 6
+
+Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle sources in Los Angeles County, California (\color{red}{\verb|fips == "06037"|}fips == "06037"). Which city has seen greater changes over time in motor vehicle emissions?
+
+```{r figure 5}
+
+SCC_dmv_2 <- SCC[grep("Vehicle",SCC$SCC.Level.Two),]
+SCC_dmv_SCC_2 <- unique(SCC_dmv_2$SCC)
+NEI_dmv_2 <- subset(NEI,SCC %in% SCC_dmv_SCC_2)
+
+NEI_dmv_type_2 <- NEI_dmv_2 %>%
+  filter(fips == "24510" | fips == "06037") %>%
+  filter(type=="ON-ROAD"|type=="NON-ROAD") %>%
+  group_by(year,type,fips) %>%
+  summarise(Emissions=sum(Emissions))
+
+NEI_dmv_type_2$fips[NEI_dmv_type_2$fips == "24510"] <- "Baltimore"
+NEI_dmv_type_2$fips[NEI_dmv_type_2$fips == "06037"] <- "Los Angeles"
+
+
+p <- ggplot(NEI_dmv_type_2, aes(x = factor(year), y = Emissions, fill = type)) + 
+  geom_bar(stat = "identity") + 
+  facet_grid(fips ~ type, scales = "free") + 
+  xlab("Year") + 
+  ylab(expression("Total Tons of PM"[2.5]*" Emissions")) + 
+  ggtitle(expression("Total Tons of PM"[2.5]*" Emissions  from Motor Vehicle Sources in Baltimore and Los Angeles")) +
+  theme(axis.text.x=element_text(angle = 90, vjust = 0.5, hjust = 1), plot.title = element_text(size=rel(1.5), face="bold",hjust = 0.5))
+
+ggsave(file="plot6.png",plot = print(p), width = 10, height = 5, dpi = 300)
+
+p
+
+```
+
+Both non-road and on-road motor vehicle emissions have decreased from 1999-2008 in Baltimore, but not in Los Angeles.

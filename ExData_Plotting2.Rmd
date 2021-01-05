@@ -233,3 +233,20 @@ p
 ```
 
 Both non-road and on-road motor vehicle emissions have decreased from 1999-2008 in Baltimore, but not in Los Angeles.
+
+```{r cleanup}
+
+if(file.exists("exdata_data_NEI_data.zip")){
+  unlink("exdata_data_NEI_data.zip")
+}
+
+if(file.exists("summarySCC_PM25.rds")){
+  unlink("summarySCC_PM25.rds")
+}
+
+if(file.exists("Source_Classification_Code.rds")){
+  unlink("Source_Classification_Code.rds")
+}
+
+```
+

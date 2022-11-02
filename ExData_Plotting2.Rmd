@@ -3,6 +3,17 @@ title: "Exploratory Data Analysis Assignment 2"
 author: "Myron Keith Gibert Jr"
 date: "1/4/2021"
 output: pdf_document
+header-includes:
+- \usepackage{hyperref}
+- \hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
+toc: TRUE
 ---
 
 ```{r setup, include=FALSE}
@@ -13,9 +24,12 @@ library("tidyverse")
 
 if (!require("ggplot2")) install.packages("ggplot2")
 library("ggplot2")
+
+if (!require("ggthemes")) install.packages("ggthemes")
+library("ggthemes")
 ```
 
-## Introduction
+# Introduction
 
 Fine particulate matter (PM2.5) is an ambient air pollutant for which there is strong evidence that it is harmful to human health. In the United States, the Environmental Protection Agency (EPA) is tasked with setting national ambient air quality standards for fine PM and for tracking the emissions of this pollutant into the atmosphere. Approximatly every 3 years, the EPA releases its database on emissions of PM2.5. This database is known as the National Emissions Inventory (NEI). You can read more information about the NEI at the EPA National Emissions Inventory web site.
 
@@ -25,7 +39,7 @@ For each year and for each type of PM source, the NEI records how many tons of P
 
 The data for this assignment are available from the course web site as a single zip file:
 
-(Data for Peer Assessment)[https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip] [29Mb]
+[Data for Peer Assessment](https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip) [29Mb]
 
 The zip file contains two files:
 
@@ -33,7 +47,7 @@ PM2.5 Emissions Data (summarySCC_PM25.rds): This file contains a data frame with
 
 Source Classification Code Table (Source_Classification_Code.rds): This table provides a mapping from the SCC digit strings in the Emissions table to the actual name of the PM2.5 source. The sources are categorized in a few different ways from more general to more specific and you may choose to explore whatever categories you think are most useful. For example, source “10100101” is known as “Ext Comb /Electric Gen /Anthracite Coal /Pulverized Coal”.
 
-## Reading in Data
+# Reading in Data
 
 I used the following commands to read in the data.  The chunk first checks for the presence of the dataset zip file.  If it is not present, then the file is downloaded.  Then, the chunk checks for the presence of the individual datasets.  If any of them are not present in the working directory, the chunk will extract the original zip file.  After this has been completed, I read the data in using the final two lines.
 
@@ -62,11 +76,21 @@ For each plot, I did the following:
 * Upload the PNG file on the Assignment submission page
 * Copy and paste the R code from the corresponding R file into the text box at the appropriate point in the peer assessment.
 
+# Completing the Assignment
+
+Now, we're ready to start answering some questions in the next few pages.
+
+(CONTINUED ON NEXT PAGE)
+
+\pagebreak
+
+
+
 ## Problem 1
 
 Have total emissions from PM2.5 decreased in the United States from 1999 to 2008? Using the base plotting system, make a plot showing the total PM2.5 emission from all sources for each of the years 1999, 2002, 2005, and 2008.
 
-```{r figure 1}
+```{r figure 1,eval=FALSE}
 
 NEI_summary <- NEI %>%
   group_by(year) %>%
@@ -83,14 +107,41 @@ dev.off()
 
 ```
 
+```{r figure 1_run1,warning=FALSE,message=FALSE,results=FALSE,echo=FALSE}
+
+NEI_summary <- NEI %>%
+  group_by(year) %>%
+  summarise(Emissions=sum(Emissions))
+
+png(file="plot1.png")
+
+```
+
+```{r figure 1_run2,echo=FALSE,fig.width=10,fig.height=5}
+
+plot(NEI_summary$year,NEI_summary$Emissions, type = "l", lwd = 2, 
+     xlab = "Year", 
+     ylab = expression("Total Tons of PM"[2.5]*" Emissions"), 
+     main = expression("Total Tons of PM"[2.5]*" Emissions in the United States"))
+
+```
+
+```{r figure 1_run3,warning=FALSE,message=FALSE,results=FALSE,echo=FALSE}
+
+dev.off()
+
+```
+
 Emissions have decreased in the United States from 1999 to 2008.
+
+\pagebreak
 
 ## Problem 2
 
 Have total emissions from PM2.5 decreased in the Baltimore City, Maryland (fips == "24510") from 1999 to 2008? Use the base plotting system to make a plot answering this question.
 Of the four types of sources indicated by the (point, nonpoint, onroad, nonroad) variable, which of these four sources have seen decreases in emissions from 1999–2008 for Baltimore City? Which have seen increases in emissions from 1999–2008? Use the ggplot2 plotting system to make a plot answer this question.
 
-```{r figure 2}
+```{r figure 2,eval=FALSE}
 
 NEI_baltimore <- NEI %>%
   filter(fips == 24510) %>%
@@ -108,13 +159,66 @@ dev.off()
 
 ```
 
+```{r figure 2_run1,warning=FALSE,message=FALSE,results=FALSE,echo=FALSE}
+
+NEI_baltimore <- NEI %>%
+  filter(fips == 24510) %>%
+  group_by(year) %>%
+  summarise(Emissions=sum(Emissions))
+
+png(file="plot2.png")
+
+```
+
+```{r figure 2_run2,warning=FALSE,echo=FALSE,fig.width=10,fig.height=5}
+
+plot(NEI_baltimore$year,NEI_baltimore$Emissions, type = "l", lwd = 2, 
+     xlab = "Year", 
+     ylab = expression("Total Tons of PM"[2.5]*" Emissions"), 
+     main = expression("Total Tons of PM"[2.5]*" Emissions in the Baltimore"))
+
+```
+
+```{r figure 2_run3,warning=FALSE,message=FALSE,results=FALSE,echo=FALSE}
+
+dev.off()
+```
+
 Emissions have decreased in Baltimore City, Maryland from 1999 to 2008.
+
+\pagebreak
 
 ## Problem 3
 
 Of the four types of sources indicated by the "type" (point, nonpoint, onroad, nonroad) variable, which of these four sources have seen decreases in emissions from 1999–2008 for Baltimore City? Which have seen increases in emissions from 1999–2008? Use the ggplot2 plotting system to make a plot answer this question.
 
-```{r figure 3}
+```{r figure 3,eval=FALSE}
+
+NEI_baltimore_type <- NEI %>%
+  filter(fips == 24510) %>%
+  group_by(year,type) %>%
+  summarise(Emissions=sum(Emissions))
+
+p <- ggplot(NEI_baltimore_type, 
+            aes(x = factor(year), y = Emissions, fill = type)) + 
+  geom_bar(stat = "identity") + 
+  facet_grid(. ~ type) + 
+  xlab("Year") + 
+  ylab(expression("Total Tons of PM"[2.5]*" Emissions")) + 
+  ggtitle(expression("Total Tons of PM"[2.5]*" Emissions in Baltimore 
+                     by Source Type")) +
+  theme_light() +
+  scale_color_colorblind() +
+  scale_fill_colorblind() +
+  theme(axis.text.x=element_text(size=rel(1.2),angle = 90, vjust = 0.5, hjust = 1),
+        plot.title = element_text(size=rel(1.2), face="bold",hjust = 0.5),
+        legend.position = "none") 
+
+ggsave(file="plot3.png",plot = print(p), width = 10, height = 5, dpi = 300)
+
+```
+
+```{r figure 3_run1,echo=FALSE,warning=FALSE,message=FALSE,fig.width=10,fig.height=5}
 
 NEI_baltimore_type <- NEI %>%
   filter(fips == 24510) %>%
@@ -127,21 +231,54 @@ p <- ggplot(NEI_baltimore_type, aes(x = factor(year), y = Emissions, fill = type
   xlab("Year") + 
   ylab(expression("Total Tons of PM"[2.5]*" Emissions")) + 
   ggtitle(expression("Total Tons of PM"[2.5]*" Emissions in Baltimore by Source Type")) +
-  theme(axis.text.x=element_text(angle = 90, vjust = 0.5, hjust = 1), plot.title = element_text(size=rel(1.5), face="bold",hjust = 0.5))
+  theme_light() +
+  scale_color_colorblind() +
+  scale_fill_colorblind() +
+  theme(axis.text.x=element_text(size=rel(1.2),angle = 90, vjust = 0.5, hjust = 1),
+        plot.title = element_text(size=rel(1.2), face="bold",hjust = 0.5),
+        legend.position = "none") 
 
 ggsave(file="plot3.png",plot = print(p), width = 10, height = 5, dpi = 300)
-
-p
 
 ```
 
 On-road, Off-road, and Nonpoint emissions decreased in Baltimore City from 1999-2008.
 
+\pagebreak
+
 ## Problem 4
 
 Across the United States, how have emissions from coal combustion-related sources changed from 1999–2008?
 
-```{r figure 4}
+```{r figure 4,eval=FALSE}
+
+SCC_coal <- SCC[grep("Coal",SCC$Short.Name),]
+SCC_coal_SCC <- unique(SCC_coal$SCC)
+NEI_coal <- subset(NEI,SCC %in% SCC_coal_SCC)
+
+NEI_coal_type <- NEI_coal %>%
+  group_by(year,type) %>%
+  summarise(Emissions=sum(Emissions))
+
+p <- ggplot(NEI_coal_type, aes(x = factor(year), y = Emissions, fill = type)) + 
+  geom_bar(stat = "identity") + 
+  facet_grid(. ~ type) + 
+  xlab("Year") + 
+  ylab(expression("Total Tons of PM"[2.5]*" Emissions")) + 
+  ggtitle(expression("Total Tons of PM"[2.5]*" Emissions in the United States 
+                     from Coal Combustion-related Sources")) +
+  theme_light() +
+  scale_color_colorblind() +
+  scale_fill_colorblind() +
+  theme(axis.text.x=element_text(size=rel(1.2),angle = 90, vjust = 0.5, hjust = 1),
+        plot.title = element_text(size=rel(1.2), face="bold",hjust = 0.5),
+        legend.position = "none") 
+
+ggsave(file="plot4.png",plot = print(p), width = 10, height = 5, dpi = 300)
+
+```
+
+```{r figure 4_run1,echo=FALSE,warning=FALSE,message=FALSE,fig.width=10,fig.height=5}
 
 SCC_coal <- SCC[grep("Coal",SCC$Short.Name),]
 SCC_coal_SCC <- unique(SCC_coal$SCC)
@@ -157,21 +294,55 @@ p <- ggplot(NEI_coal_type, aes(x = factor(year), y = Emissions, fill = type)) +
   xlab("Year") + 
   ylab(expression("Total Tons of PM"[2.5]*" Emissions")) + 
   ggtitle(expression("Total Tons of PM"[2.5]*" Emissions in the United States from Coal Combustion-related Sources")) +
-  theme(axis.text.x=element_text(angle = 90, vjust = 0.5, hjust = 1), plot.title = element_text(size=rel(1.5), face="bold",hjust = 0.5))
+  theme_light() +
+  scale_color_colorblind() +
+  scale_fill_colorblind() +
+  theme(axis.text.x=element_text(size=rel(1.2),angle = 90, vjust = 0.5, hjust = 1),
+        plot.title = element_text(size=rel(1.2), face="bold",hjust = 0.5),
+        legend.position = "none") 
 
 ggsave(file="plot4.png",plot = print(p), width = 10, height = 5, dpi = 300)
-
-p
 
 ```
 
 Point emissions in the United States have steadily decreased since 1999, while nonpoint emissions spiked between 1999-2005 before decreasing from 2005-2008. 
 
+\pagebreak
+
 ## Problem 5
 
 Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle sources in Los Angeles County, California (fips == "06037"). Which city has seen greater changes over time in motor vehicle emissions?
 
-```{r figure 5}
+```{r figure 5,eval=FALSE}
+
+SCC_dmv <- SCC[grep("Vehicle",SCC$SCC.Level.Two),]
+SCC_dmv_SCC <- unique(SCC_dmv$SCC)
+NEI_dmv <- subset(NEI,SCC %in% SCC_dmv_SCC)
+
+NEI_dmv_type <- NEI_dmv %>%
+  filter(type=="ON-ROAD"|type=="NON-ROAD") %>%
+  group_by(year,type) %>%
+  summarise(Emissions=sum(Emissions))
+
+p <- ggplot(NEI_dmv_type, aes(x = factor(year), y = Emissions, fill = type)) + 
+  geom_bar(stat = "identity") + 
+  facet_grid(. ~ type) + 
+  xlab("Year") + 
+  ylab(expression("Total Tons of PM"[2.5]*" Emissions")) + 
+  ggtitle(expression("Total Tons of PM"[2.5]*" Emissions in the United States 
+                     from Motor Vehicle Sources")) +
+  theme_light() +
+  scale_color_colorblind() +
+  scale_fill_colorblind() +
+  theme(axis.text.x=element_text(size=rel(1.2),angle = 90, vjust = 0.5, hjust = 1),
+        plot.title = element_text(size=rel(1.2), face="bold",hjust = 0.5),
+        legend.position = "none") 
+
+ggsave(file="plot5.png",plot = print(p), width = 10, height = 5, dpi = 300)
+
+```
+
+```{r figure 5_run1,echo=FALSE,warning=FALSE,message=FALSE,fig.width=10,fig.height=5}
 
 SCC_dmv <- SCC[grep("Vehicle",SCC$SCC.Level.Two),]
 SCC_dmv_SCC <- unique(SCC_dmv$SCC)
@@ -188,21 +359,60 @@ p <- ggplot(NEI_dmv_type, aes(x = factor(year), y = Emissions, fill = type)) +
   xlab("Year") + 
   ylab(expression("Total Tons of PM"[2.5]*" Emissions")) + 
   ggtitle(expression("Total Tons of PM"[2.5]*" Emissions in the United States from Motor Vehicle Sources")) +
-  theme(axis.text.x=element_text(angle = 90, vjust = 0.5, hjust = 1), plot.title = element_text(size=rel(1.5), face="bold",hjust = 0.5))
+  theme_light() +
+  scale_color_colorblind() +
+  scale_fill_colorblind() +
+  theme(axis.text.x=element_text(size=rel(1.2),angle = 90, vjust = 0.5, hjust = 1),
+        plot.title = element_text(size=rel(1.2), face="bold",hjust = 0.5),
+        legend.position = "none") 
 
 ggsave(file="plot5.png",plot = print(p), width = 10, height = 5, dpi = 300)
-
-p
 
 ```
 
 Both non-road and on-road motor vehicle emissions have decreased in the United States from 1999-2008.
 
+\pagebreak
+
 ## Problem 6
 
-Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle sources in Los Angeles County, California (\color{red}{\verb|fips == "06037"|}fips == "06037"). Which city has seen greater changes over time in motor vehicle emissions?
+Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle sources in Los Angeles County, California. Which city has seen greater changes over time in motor vehicle emissions?
 
-```{r figure 5}
+```{r figure 6,eval=FALSE}
+
+SCC_dmv_2 <- SCC[grep("Vehicle",SCC$SCC.Level.Two),]
+SCC_dmv_SCC_2 <- unique(SCC_dmv_2$SCC)
+NEI_dmv_2 <- subset(NEI,SCC %in% SCC_dmv_SCC_2)
+
+NEI_dmv_type_2 <- NEI_dmv_2 %>%
+  filter(fips == "24510" | fips == "06037") %>%
+  filter(type=="ON-ROAD"|type=="NON-ROAD") %>%
+  group_by(year,type,fips) %>%
+  summarise(Emissions=sum(Emissions))
+
+NEI_dmv_type_2$fips[NEI_dmv_type_2$fips == "24510"] <- "Baltimore"
+NEI_dmv_type_2$fips[NEI_dmv_type_2$fips == "06037"] <- "Los Angeles"
+
+
+p <- ggplot(NEI_dmv_type_2, aes(x = factor(year), y = Emissions, fill = type)) + 
+  geom_bar(stat = "identity") + 
+  facet_grid(fips ~ type, scales = "free") + 
+  xlab("Year") + 
+  ylab(expression("Total Tons of PM"[2.5]*" Emissions")) + 
+  ggtitle(expression("Total Tons of PM"[2.5]*" Emissions  from Motor Vehicle 
+                     Sources in Baltimore and Los Angeles")) +
+  theme_light() +
+  scale_color_colorblind() +
+  scale_fill_colorblind() +
+  theme(axis.text.x=element_text(size=rel(1.2),angle = 90, vjust = 0.5, hjust = 1),
+        plot.title = element_text(size=rel(1.2), face="bold",hjust = 0.5),
+        legend.position = "none") 
+
+ggsave(file="plot6.png",plot = print(p), width = 10, height = 5, dpi = 300)
+
+```
+
+```{r figure 6_run1,echo=FALSE,warning=FALSE,message=FALSE,fig.width=10,fig.height=5}
 
 SCC_dmv_2 <- SCC[grep("Vehicle",SCC$SCC.Level.Two),]
 SCC_dmv_SCC_2 <- unique(SCC_dmv_2$SCC)
@@ -224,14 +434,41 @@ p <- ggplot(NEI_dmv_type_2, aes(x = factor(year), y = Emissions, fill = type)) +
   xlab("Year") + 
   ylab(expression("Total Tons of PM"[2.5]*" Emissions")) + 
   ggtitle(expression("Total Tons of PM"[2.5]*" Emissions  from Motor Vehicle Sources in Baltimore and Los Angeles")) +
-  theme(axis.text.x=element_text(angle = 90, vjust = 0.5, hjust = 1), plot.title = element_text(size=rel(1.5), face="bold",hjust = 0.5))
+  theme_light() +
+  scale_color_colorblind() +
+  scale_fill_colorblind() +
+  theme(axis.text.x=element_text(size=rel(1.2),angle = 90, vjust = 0.5, hjust = 1),
+        plot.title = element_text(size=rel(1.2), face="bold",hjust = 0.5),
+        legend.position = "none") 
 
 ggsave(file="plot6.png",plot = print(p), width = 10, height = 5, dpi = 300)
 
-p
+```
+
+Both non-road and on-road motor vehicle emissions have decreased from 1999-2008 in Baltimore, but not in Los Angeles.
+
+# Clean-up
+
+Removes unnecessary files after analysis is completed.
+
+```{r cleanup}
+
+if(file.exists("exdata_data_NEI_data.zip")){
+  unlink("exdata_data_NEI_data.zip")
+}
+
+if(file.exists("summarySCC_PM25.rds")){
+  unlink("summarySCC_PM25.rds")
+}
+
+if(file.exists("Source_Classification_Code.rds")){
+  unlink("Source_Classification_Code.rds")
+}
 
 ```
 
+<<<<<<< HEAD
+=======
 Both non-road and on-road motor vehicle emissions have decreased from 1999-2008 in Baltimore, but not in Los Angeles.
 
 ```{r cleanup}
@@ -250,3 +487,4 @@ if(file.exists("Source_Classification_Code.rds")){
 
 ```
 
+>>>>>>> d9615cdae68612847d35c4a8ec71c9e33b5db0d1

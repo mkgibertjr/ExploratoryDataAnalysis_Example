@@ -16,18 +16,10 @@ header-includes:
 toc: TRUE
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-
-if (!require("tidyverse")) install.packages("tidyverse")
-library("tidyverse")
-
-if (!require("ggplot2")) install.packages("ggplot2")
-library("ggplot2")
-
-if (!require("ggthemes")) install.packages("ggthemes")
-library("ggthemes")
-```
+\thispagestyle{empty}
+\clearpage
+\pagenumbering{arabic} 
+\pagebreak
 
 # Introduction
 
@@ -47,7 +39,24 @@ PM2.5 Emissions Data (summarySCC_PM25.rds): This file contains a data frame with
 
 Source Classification Code Table (Source_Classification_Code.rds): This table provides a mapping from the SCC digit strings in the Emissions table to the actual name of the PM2.5 source. The sources are categorized in a few different ways from more general to more specific and you may choose to explore whatever categories you think are most useful. For example, source “10100101” is known as “Ext Comb /Electric Gen /Anthracite Coal /Pulverized Coal”.
 
-# Reading in Data
+## Set-up
+
+Loading relevant packages.
+
+```{r setup,message=FALSE,warning=FALSE,results=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+if (!require("tidyverse")) install.packages("tidyverse")
+library("tidyverse")
+
+if (!require("ggplot2")) install.packages("ggplot2")
+library("ggplot2")
+
+if (!require("ggthemes")) install.packages("ggthemes")
+library("ggthemes")
+```
+
+## Reading in Data
 
 I used the following commands to read in the data.  The chunk first checks for the presence of the dataset zip file.  If it is not present, then the file is downloaded.  Then, the chunk checks for the presence of the individual datasets.  If any of them are not present in the working directory, the chunk will extract the original zip file.  After this has been completed, I read the data in using the final two lines.
 
@@ -466,25 +475,3 @@ if(file.exists("Source_Classification_Code.rds")){
 }
 
 ```
-
-<<<<<<< HEAD
-=======
-Both non-road and on-road motor vehicle emissions have decreased from 1999-2008 in Baltimore, but not in Los Angeles.
-
-```{r cleanup}
-
-if(file.exists("exdata_data_NEI_data.zip")){
-  unlink("exdata_data_NEI_data.zip")
-}
-
-if(file.exists("summarySCC_PM25.rds")){
-  unlink("summarySCC_PM25.rds")
-}
-
-if(file.exists("Source_Classification_Code.rds")){
-  unlink("Source_Classification_Code.rds")
-}
-
-```
-
->>>>>>> d9615cdae68612847d35c4a8ec71c9e33b5db0d1

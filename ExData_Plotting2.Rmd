@@ -1,5 +1,5 @@
 ---
-title: "Exploratory Data Analysis Assignment 2"
+title: "Exploratory Data Analysis - Assignment #2"
 author: "Myron Keith Gibert Jr"
 date: "1/4/2021"
 output: pdf_document
@@ -10,7 +10,7 @@ header-includes:
     linkcolor=black,
     filecolor=magenta,      
     urlcolor=cyan,
-    pdftitle={Overleaf Example},
+    pdftitle={Exploratory Data Analysis - Assignment 2},
     pdfpagemode=FullScreen,
     }
 toc: TRUE
@@ -20,6 +20,28 @@ toc: TRUE
 \clearpage
 \pagenumbering{arabic} 
 \pagebreak
+
+```{r tinytex, include=FALSE}
+## INSTALLING LATEX FOR RMARKDOWN
+
+#RMarkdown requires LaTex to create pdf documents as an output. More information can be found [here](https://bookdown.org/yihui/rmarkdown/pdf-document.html). Alternatively, output can be set to "html_document" or "word_document". End users may install LaTex by setting the "wanttinytex" variable to FALSE and running the following script:
+
+#Install tinytex to let RMarkdown create a pdf document? Default: wanttinytex <- FALSE
+wanttinytex <- FALSE
+
+if(wanttinytex == TRUE){
+
+if(tinytex:::is_tinytex()==FALSE && wanttinytex == TRUE){
+  if (!require("tinytex")) install.packages("tinytex")
+  tinytex::install_tinytex()
+  tinytex:::install_prebuilt()}
+
+library("tinytex")
+#tlmgr_install("fvextra")
+
+}
+
+```
 
 # Introduction
 
